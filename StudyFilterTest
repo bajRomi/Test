@@ -1,0 +1,1192 @@
+using AutoTestModules.TestModules;
+using OpenQA.Selenium;
+using SSWPAutomationAPI.PageModels;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using TestAutomationAPI;
+using System.Threading;
+using OpenQA.Selenium.Support.UI;
+using OpenQA.Selenium.Interactions;
+using Sample.Properties;
+namespace Test_Automation.Tests
+{
+    class StudyFilterTest
+    {
+        //private object studyPage;
+        StudiesPage studyPage = null;
+        Login login = null;
+        TestLog log = new TestLog();
+        DateTime dt = DateTime.Now;
+        
+    
+        public StudyFilterTest(IWebDriver driver)
+    {
+        log.Init(driver, -1);
+        log.OpenReport("StudyFilterTest");
+        // clear the cache before starting
+        var clearCache = new ClearCache(driver, log);
+
+            //login as Admin
+              userAdmin(driver, log);
+              studyStatus();
+              UploadedDate(driver);
+              TechNotified1(driver);
+              TechNotified2(driver);
+              InterpreterNotified1(driver);
+              InterpreterNotified2(driver);
+              StudyID(driver);
+              orderingProvider(driver);
+              PatientDetail(driver);
+              miscVerification_common(driver);
+              miscVerification_uncommon(driver);
+              studyPage.btn_logOut.Click();
+
+           //login as technician
+              userT(driver, log);
+              studyStatus();
+              ScheduledDate(driver);
+              FinalizedDate(driver);
+              StudyID(driver);
+              orderingProvider(driver);
+              PatientDetail(driver);
+              miscVerification_common(driver);
+              miscVerification_uncommon1(driver);
+              studyPage.btn_logOut.Click();
+
+              //login as Interpreteer
+                userI(driver, log);
+                studyStatus();
+                ScheduledDate(driver);
+                FinalizedDate(driver);
+                StudyID(driver);
+                orderingProvider(driver);
+                PatientDetail(driver);
+                miscVerification_common(driver);
+                miscVerification_uncommon1(driver);
+                studyPage.btn_logOut.Click();
+
+
+               //login as OfficeAdmin
+                  userOA(driver, log);
+                  studyStatus();
+                  ScheduledDate(driver);
+                  FinalizedDate(driver);
+                  StudyID(driver);
+                  orderingProvider(driver);
+                  PatientDetail(driver);
+                  miscVerification_common(driver);
+                  miscVerification_uncommon1(driver);
+                  studyPage.btn_logOut.Click();
+
+
+                  //login as Order provider
+                  userOP(driver, log);
+                  studyStatus();
+                  FinalizedDate(driver);
+                  StudyID(driver);
+                  orderingProvider(driver);
+                  PatientDetail(driver);
+                  miscVerification_common(driver);
+                  miscVerification_uncommon1(driver);
+                  studyPage.btn_logOut.Click();
+      
+                //login as Scoring manager
+                  userSM(driver, log);
+                  studyStatus();
+                  UploadedDate(driver);
+                  TechNotified1(driver);
+                  TechNotified2(driver);
+                  InterpreterNotified1(driver);
+                  InterpreterNotified2(driver);
+                  StudyID(driver);
+                  orderingProvider(driver);
+                  PatientDetail(driver);
+                  miscVerification_common(driver);
+                  miscVerification_uncommon(driver);
+                  studyPage.btn_logOut.Click();
+
+         log.CloseReport();
+    }
+
+    //Login as user administrator
+    public void userAdmin(IWebDriver driver, TestLog log)
+    {
+        login = new Login(driver, log, Sample.Properties.Settings.Default.AdminUserName, Sample.Properties.Settings.Default.AdminUserPwd);
+        var homepage = new HomePage(driver);
+        homepage.btn_ReviewStudies.Click();
+        studyPage = new StudiesPage(driver, StudiesPage.UserTypes.Admin);
+    }
+
+    //Login for user Technician
+    public void userT(IWebDriver driver, TestLog log)
+    {
+        login = new Login(driver, log, Sample.Properties.Settings.Default.TechUserName, Sample.Properties.Settings.Default.TechUserPwd);
+        var homepage = new HomePage(driver);
+        homepage.btn_ReviewStudies.Click();
+        studyPage = new StudiesPage(driver, StudiesPage.UserTypes.Tech);
+
+
+    }
+
+    //Login for user Interpreter
+    public void userI(IWebDriver driver, TestLog log)
+    {
+        login = new Login(driver, log, Sample.Properties.Settings.Default.InterUserName, Sample.Properties.Settings.Default.InterUserPwd);
+        var homepage = new HomePage(driver);
+        homepage.btn_ReviewStudies.Click();
+        studyPage = new StudiesPage(driver, StudiesPage.UserTypes.Interp);
+    }
+
+    //Login for user OfficeAdmin
+    public void userOA(IWebDriver driver, TestLog log)
+    {
+        login = new Login(driver, log, Sample.Properties.Settings.Default.OAUserName, Sample.Properties.Settings.Default.OAUserPwd);
+        var homepage = new HomePage(driver);
+        homepage.btn_ReviewStudies.Click();
+        studyPage = new StudiesPage(driver, StudiesPage.UserTypes.OA);
+    }
+    // user Order Provider
+    public void userOP(IWebDriver driver, TestLog log)
+    {
+        login = new Login(driver, log, Sample.Properties.Settings.Default.OPUserName, Sample.Properties.Settings.Default.OPUserPwd);
+        var homepage = new HomePage(driver);
+        homepage.btn_ReviewStudies.Click();
+        studyPage = new StudiesPage(driver, StudiesPage.UserTypes.OP);
+
+
+    }
+
+    //Login for user ScoringManger
+    public void userSM(IWebDriver driver, TestLog log)
+    {
+        login = new Login(driver, log, Sample.Properties.Settings.Default.SMUserName, Sample.Properties.Settings.Default.SMUserPwd);
+        var homepage = new HomePage(driver);
+        homepage.btn_ReviewStudies.Click();
+        studyPage = new StudiesPage(driver, StudiesPage.UserTypes.SM);
+
+
+    }
+    // Selecting different Study Status
+
+    public void studyStatus()
+    {
+
+        log.CaptureStep("Filter the study status by Scheduled ", " Check only studies with a status of Scheduled are listed. ", () =>
+        {
+            studyPage.FilterByStatus("Scheduled");
+        },studyPage.tableFrame);
+            
+        log.CaptureStep("Filter the study status by Scoring ", " Check only studies with a status of Scoring are listed. ", () =>
+        {
+            studyPage.FilterByStatus("Scoring");
+        });
+     
+        log.CaptureStep("Filter the study status by Interpreting  ", " Check only studies with a status of Interpreting are listed. ", () =>
+        {
+            studyPage.FilterByStatus("Interpreting");
+        });
+        
+        log.CaptureStep("Filter the study status by Finalized", " Check only studies with a status of Finalized are listed. ", () =>
+        {
+            studyPage.FilterByStatus("Finalized");
+        });
+       
+        log.CaptureStep(" Filter the study status by Delivered  ", " Check only studies with a status of Delivered are listed. ", () =>
+        {
+            studyPage.FilterByStatus("Delivered");
+        });
+       
+        log.CaptureStep(" Filter the study status by Error", " Check only studies with a status of Error are listed. ", () =>
+        {
+            studyPage.FilterByStatus("Error");
+        });
+     
+        log.CaptureStep("Filter the study status by Processing ", " Check only studies with a status of Processing are listed. ", () =>
+        {
+            studyPage.FilterByStatus("Processing");
+        });
+    
+        studyPage.btn_ClearFilter.Click();
+        studyPage.waitTime();
+      
+
+    }
+
+    public string DateTimeChange(int num)
+    {
+        DateTime dt = DateTime.Now;
+        dt = dt.AddDays(num);
+        String newDate = dt.ToString("MM/dd/yy");
+        return newDate;
+    }
+
+    // test step from 12 to 19 for the Uploaded Date tab ( Available for Administrator and Scoring Manager only)
+    public void UploadedDate(IWebDriver driver)
+    {
+            studyPage.UploadedDateFilter.Click();
+            
+            log.CaptureStep(" Filter the UploadDate by NewestToOldest", " Check the studies are listed from NewestToLowest. ", () =>
+            {
+                studyPage.Upload_NewestToOldest.Click();
+                studyPage.waitTime();
+            });
+            studyPage.UploadedDateFilter.Click();
+          
+            log.CaptureStep(" Filter the UploadDate by OldestToNewset", " Check the studies are listed from OldestToNewset. ", () =>
+            {
+                studyPage.Upload_OldestToNewest.Click();
+                studyPage.waitTime();
+             });
+            studyPage.UploadedDateFilter.Click();
+            studyPage.Wait(studyPage.Upload_FromDate);
+
+            //getting the current date and adding a future date (adding 1 day to the current system date to be the future date)
+            // test step 15
+            string addedDate = DateTimeChange(1);
+             studyPage.Upload_FromDate.SendKeys(addedDate);
+            studyPage.Upload_FromDate.SendKeys(Keys.Enter);
+            log.CaptureStep(" Enter a day in the future as the Form date", " Verify no studies are listed ", () =>
+            {
+                studyPage.Wait(studyPage.Upload_FromDate);
+                studyPage.Upload_btnFilter.Click();
+                studyPage.waitTime();
+            });
+
+            //adding the yesterday date as ToDate ( test step 16 )
+            studyPage.UploadedDateFilter.Click();
+            studyPage.Wait(studyPage.Upload_ToDate);
+            studyPage.Upload_FromDate.Clear(); //clear the textbox
+            studyPage.Upload_FromDate.SendKeys(Keys.Enter);//  Enter action
+            studyPage.Wait(studyPage.Upload_FromDate);
+            string yesterdayDate = DateTimeChange(-1);
+           studyPage.Upload_ToDate.SendKeys(yesterdayDate);
+           studyPage.Wait(studyPage.Upload_FromDate);
+
+            //substracting a month from the to date to get the past month(test step 16)
+            dt = dt.AddMonths(-1);
+            string addedMonth = dt.ToString("MM/dd/yy");
+            //string addedMonth = dt.ToString("/MM/yy");
+       
+          studyPage.Upload_FromDate.SendKeys(addedMonth);
+          studyPage.Upload_FromDate.SendKeys(Keys.Enter);
+            log.CaptureStep(" Enter yesterday date as the date To Date and enter 1 month from To date as the From date", " Verify studies with uploaded/scheduled dates within the month range chosen are only studies in the list. ", () =>
+            {
+
+                studyPage.Wait(studyPage.Upload_btnFilter);
+                studyPage.noWait();
+                studyPage.Upload_btnFilter.Click();
+                studyPage.waitTime();
+             });
+
+        //test step 17
+            studyPage.UploadedDateFilter.Click();
+           
+            studyPage.Wait(studyPage.Upload_FromDate);
+            studyPage.Upload_FromDate.Clear();
+            studyPage.Upload_FromDate.SendKeys(Keys.Clear);
+            studyPage.Wait(studyPage.Upload_FromDate);
+            studyPage.Upload_ToDate.Clear();
+            studyPage.Upload_ToDate.SendKeys(Keys.Clear);
+            studyPage.Upload_ToDate.SendKeys(Keys.Enter);
+            studyPage.noWait();
+           // studyPage.Wait(studyPage.Upload_FromDate);
+            studyPage.Upload_btnClear.Click();
+            log.CaptureStep(" Click Clear in the Uploaded/Scheduled Date Filter window", " Verify studies of all dates are listed . ", () =>
+            {
+                studyPage.waitTime();
+            });
+
+        
+            // adding a past date to the ToDate (step 18)
+            studyPage.UploadedDateFilter.Click();
+            
+            studyPage.Wait(studyPage.Upload_FromDate);
+            string pastDate = DateTimeChange(-2);
+            //   Thread.Sleep(1000);
+            studyPage.Wait(studyPage.Upload_FromDate);
+            studyPage.Upload_ToDate.SendKeys(pastDate);
+            studyPage.Upload_ToDate.SendKeys(Keys.Enter);
+            log.CaptureStep(" Enter a past date as the To date in the Uploaded/Scheduled Date filter Window", "Verify only studies with the date selected and previous appear on the list. ", () =>
+            {
+                
+                studyPage.Wait(studyPage.Upload_FromDate);
+                studyPage.Upload_btnFilter.Click();
+                studyPage.waitTime();
+            });
+
+        ///test step 19
+       
+            studyPage.UploadedDateFilter.Click();
+            
+            studyPage.Wait(studyPage.Upload_FromDate);
+            studyPage.Upload_ToDate.Clear();
+            studyPage.Wait(studyPage.Upload_FromDate);
+           // Thread.Sleep(2000);
+            studyPage.Upload_ToDate.SendKeys(Keys.Enter);
+            // Thread.Sleep(2000);
+            studyPage.noWait();
+            log.CaptureStep(" Click Clear in the Uploaded/Scheduled Date Filter window", " Verify studies of all dates are listed . ", () =>
+            {
+                studyPage.Upload_btnClear.Click();
+                studyPage.waitTime();
+       });
+
+
+    }
+    // test step from 12 to 19 for the scheduleed Date tab (Available for Technician,Interpreter,Ordering Provider and Office Admin)
+    public void ScheduledDate(IWebDriver driver)
+    {
+       
+            studyPage.ScheduledDateFilter.Click();
+            studyPage.Wait(studyPage.Scheduled_FromDate);
+            log.CaptureStep(" Filter the UploadDate by NewestToOldest", " Check the studies are listed from NewestToLowest. ", () =>
+            {
+                studyPage.Scheduled_NewestToOldest.Click();
+
+            studyPage.waitTime();
+            });
+
+       
+            studyPage.ScheduledDateFilter.Click();
+            studyPage.Wait(studyPage.Scheduled_FromDate);
+            log.CaptureStep(" Filter the UploadDate by OldestToNewset", " Check the studies are listed from OldestToNewset. ", () =>
+            {
+                studyPage.Scheduled_OldestToNewest.Click();
+                studyPage.waitTime();
+             });
+
+             log.CaptureStep(" Enter a day in the future as the Form date", " Verify No Studies Found message appears. ", () =>
+            {
+
+                 studyPage.ScheduledDateFilter.Click();
+               //  Thread.Sleep(2000);
+                studyPage.Wait(studyPage.Scheduled_FromDate);
+                //getting the current date and adding a future date (adding 1 day to the current system date to be the future date)
+                // test step 15
+
+             string addedDate = DateTimeChange(1);
+             studyPage.Scheduled_FromDate.SendKeys(addedDate);
+             studyPage.Scheduled_FromDate.SendKeys(Keys.Enter);
+             studyPage.noWait();
+             studyPage.Scheduled_btnFilter.Click();
+             studyPage.waitTime();
+        });
+
+
+        //adding the yesterday date as ToDate ( test step 16 )
+        log.CaptureStep(" Enter a day in the future as the Form date", " Verify No Studies Found message appears. ", () =>
+        {
+            studyPage.ScheduledDateFilter.Click();
+            //Thread.Sleep(2000);
+            studyPage.Wait(studyPage.Scheduled_FromDate);
+            studyPage.Scheduled_FromDate.Clear(); //clear the textbox
+            studyPage.Wait(studyPage.Scheduled_FromDate);
+            studyPage.Scheduled_FromDate.SendKeys(Keys.Enter);//  Enter action
+            studyPage.noWait();
+            string yesterdayDate = DateTimeChange(-1);
+            studyPage.Scheduled_ToDate.SendKeys(yesterdayDate);
+            studyPage.Wait(studyPage.Scheduled_FromDate);
+
+            //substracting a month from the to date to get the past month(test step 16)
+            dt = dt.AddMonths(-1);
+            //   string addedMonth = dt.ToString("MM/dd/yy");
+            string addedMonth = dt.ToString("dd/MM/yy");
+            studyPage.Scheduled_FromDate.SendKeys(addedMonth);
+            
+            studyPage.Scheduled_FromDate.SendKeys(Keys.Enter);
+            // Thread.Sleep(4000);
+            studyPage.noWait();
+            studyPage.Scheduled_btnFilter.Click();
+            studyPage.waitTime();
+        });
+
+        //test step 17
+        log.CaptureStep(" Click Clear in the Uploaded/Scheduled Date Filter window", " Verify No Studies Found message appears . ", () =>
+        {
+
+
+            studyPage.ScheduledDateFilter.Click();
+            studyPage.Wait(studyPage.Scheduled_FromDate);
+            studyPage.Scheduled_FromDate.Clear();
+            studyPage.Scheduled_FromDate.SendKeys(Keys.Clear);
+            studyPage.Wait(studyPage.Scheduled_FromDate);
+            studyPage.Scheduled_ToDate.Clear();
+            studyPage.Scheduled_ToDate.SendKeys(Keys.Clear);
+            studyPage.Scheduled_ToDate.SendKeys(Keys.Enter);
+            studyPage.noWait();
+            studyPage.Scheduled_btnClear.Click();
+            studyPage.waitTime();
+        });
+        log.CaptureStep(" Enter a past date as the To date in the Uploaded/Scheduled Date filter Window", "Verify only studies with the date selected and previous appear on the list. ", () =>
+        {
+
+            // adding a past date to the ToDate (step 18)
+            studyPage.ScheduledDateFilter.Click();
+            studyPage.Wait(studyPage.Scheduled_FromDate);
+            string pastDate = DateTimeChange(-2);
+            studyPage.Scheduled_ToDate.SendKeys(pastDate);
+            studyPage.Scheduled_ToDate.SendKeys(Keys.Enter);
+            studyPage.noWait();
+            studyPage.Scheduled_btnFilter.Click();
+            studyPage.waitTime();
+        });
+
+        ///test step 19
+        log.CaptureStep(" Click Clear in the Uploaded/Scheduled Date Filter window", " Verify No Studies Found message appears . ", () =>
+        {
+            studyPage.ScheduledDateFilter.Click();
+            studyPage.Wait(studyPage.Scheduled_FromDate);
+
+            studyPage.Scheduled_ToDate.Clear();
+            studyPage.Scheduled_ToDate.SendKeys(Keys.Enter);
+            studyPage.noWait();
+
+            studyPage.Scheduled_btnClear.Click();
+            studyPage.waitTime();
+        });
+    }
+
+    // for TechNotified (test step from 20-24 )
+    public void TechNotified1(IWebDriver driver)
+    {
+
+            // studyPage = new StudiesPage(driver,1);
+           
+            studyPage.TechNotifiedFilter.Click();
+            studyPage.Wait(studyPage.TechNoti_FromDate);
+            log.CaptureStep(" Filter the TechNotified by NewestToOldest", " Check the studies are listed from NewestToLowest. ", () =>
+            {
+                studyPage.TechNoti_NewestToOldest.Click();
+            studyPage.waitTime();
+             });
+
+            studyPage.TechNotifiedFilter.Click();
+                
+            log.CaptureStep(" Filter the TechNotified by OldestToNewset", " Check the studies are listed from OldestToNewset. ", () =>
+            {
+                studyPage.TechNoti_OldestToNewest.Click();
+                studyPage.waitTime();
+            });
+
+            //test step 23
+                 studyPage.TechNotifiedFilter.Click();
+                studyPage.Wait(studyPage.TechNoti_FromDate);
+
+                 string addedDate = DateTimeChange(1);
+                studyPage.TechNoti_FromDate.SendKeys(addedDate);
+                studyPage.TechNoti_FromDate.SendKeys(Keys.Enter);
+            log.CaptureStep(" Enter a day in the future as the Form date", " Verify no studies message found appear. ", () =>
+            {
+
+                studyPage.Wait(studyPage.TechNoti_FromDate);
+                studyPage.TechNoti_btnFilter.Click();
+                studyPage.waitTime();
+            });
+
+            //adding the yesterday date as ToDate ( test step 24 )
+            studyPage.TechNotifiedFilter.Click();
+            studyPage.Wait(studyPage.TechNoti_FromDate);
+            studyPage.TechNoti_FromDate.Clear(); //clear the textbox
+            studyPage.Wait(studyPage.TechNoti_FromDate);
+            studyPage.TechNoti_FromDate.SendKeys(Keys.Enter);//  Enter action
+            studyPage.noWait();
+        
+             string yesterdayDate = DateTimeChange(-1);
+             studyPage.TechNoti_ToDate.SendKeys(yesterdayDate);
+            studyPage.Wait(studyPage.TechNoti_FromDate);
+
+            //substracting a month from the to date to get the past month(test step 24)
+            dt = dt.AddMonths(-1);
+            string addedMonth = dt.ToString("MM/dd/yy");
+            studyPage.TechNoti_FromDate.SendKeys(addedMonth);
+            studyPage.TechNoti_FromDate.SendKeys(Keys.Enter);
+            //studyPage.Wait(studyPage.TechNoti_FromDate);
+            log.CaptureStep(" Enter yesterday date as the date To Date and enter 1 month from To date as the From date", " Verify studies with uploaded/scheduled dates within the month range chosen and are only studies in the list. ", () =>
+            {
+                studyPage.noWait();
+                studyPage.TechNoti_btnFilter.Click();
+                studyPage.waitTime();
+        });
+
+            studyPage.TechNotifiedFilter.Click();
+            studyPage.Wait(studyPage.TechNoti_FromDate);
+            log.CaptureStep(" Click Clear in the techNotified Date Filter window", " Verify studies of all dates are listed . ", () =>
+            {
+
+                studyPage.TechNoti_FromDate.Clear();
+                studyPage.TechNoti_ToDate.SendKeys(Keys.Enter);
+                studyPage.Wait(studyPage.TechNoti_FromDate);
+                studyPage.TechNoti_ToDate.Clear();
+                studyPage.waitTime();
+          // studyPage.TechNoti_ToDate.SendKeys(Keys.Enter);
+             });
+
+
+        }
+    //-----For techNotified (Test step 26-28)-----
+    public void TechNotified2(IWebDriver driver)
+    {
+     //step 25
+            
+   
+           studyPage.TechNoti_TechName.SendKeys("Baj");
+            studyPage.Wait(studyPage.TechNoti_FromDate);
+            log.CaptureStep(" Enter a last name of Technician who is not in the system ", " Verify no studies are listed for that Technician. ", () =>
+            {
+                studyPage.TechNoti_btnFilter.Click();
+                studyPage.waitTime();
+            });
+
+            // Step 26
+   
+            studyPage.TechNotifiedFilter.Click();
+            studyPage.Wait(studyPage.TechNoti_FromDate);
+            log.CaptureStep(" Click Clear filter button", " Verify all the studies are listed. ", () =>
+            {
+                studyPage.TechNoti_btnClear.Click();
+                studyPage.waitTime();
+              });
+            // Step 27
+   
+             studyPage.TechNotifiedFilter.Click();
+             studyPage.Wait(studyPage.TechNoti_FromDate);
+            studyPage.TechNoti_TechName.SendKeys("T");
+            
+            log.CaptureStep(" Enter a last name of a technician which is in the system", " Verify only the studies containing tech last name are listed ", () =>
+            {
+                studyPage.TechNoti_btnFilter.Click();
+                studyPage.waitTime();
+            });
+
+            // Step 28
+   
+             studyPage.TechNotifiedFilter.Click();
+             studyPage.Wait(studyPage.TechNoti_FromDate);
+            log.CaptureStep(" Click clear filter button", " Verify all the studies are listed ", () =>
+            {
+                    studyPage.TechNoti_btnClear.Click();
+                    studyPage.waitTime();
+             });
+
+    }
+
+    //-----  For InterpreterNotified (Test step 29 -33 )-----
+    public void InterpreterNotified1(IWebDriver driver)
+    {
+            //step 30
+            // studyPage = new StudiesPage(driver,1);
+   
+                studyPage.InterpFilter.Click();
+               // studyPage.Wait(studyPage.TechNoti_FromDate);
+            log.CaptureStep(" Filter the InterpreterNotified by NewestToOldest", " Check the studies are listed from NewestToLowest. ", () =>
+    {
+                studyPage.Interp_NewestToOldest.Click();
+                studyPage.waitTime();
+    });
+            //step 31
+    
+                studyPage.InterpFilter.Click();
+              
+        log.CaptureStep(" Filter the UploadDate by OldestToNewset", " Check the studies are listed from OldestToNewset. ", () =>
+    {
+                studyPage.Interp_OldestToNewset.Click();
+                studyPage.waitTime();
+
+    });
+
+            //test step 32
+            studyPage.InterpFilter.Click();
+            studyPage.Wait(studyPage.Interp_FromDate);
+
+            string addedDate = DateTimeChange(1);
+             studyPage.Interp_FromDate.SendKeys(addedDate);
+             studyPage.Interp_FromDate.SendKeys(Keys.Enter);
+            log.CaptureStep(" Enter a day in the future as the Form date", " Check the date is a future date. ", () =>
+            {
+
+                studyPage.Wait(studyPage.Interp_FromDate);
+                studyPage.Interp_btnFilter.Click();
+                studyPage.waitTime();
+            });
+
+            //adding the yesterday date as ToDate ( test step 33 )
+            studyPage.InterpFilter.Click();
+            studyPage.Wait(studyPage.Interp_FromDate);
+            studyPage.Interp_FromDate.Clear(); //clear the textbox
+            studyPage.Wait(studyPage.Interp_FromDate);
+            studyPage.Interp_FromDate.SendKeys(Keys.Enter);//  Enter action
+            studyPage.noWait();
+            string yesterdayDate = DateTimeChange(-1);
+            studyPage.Interp_ToDate.SendKeys(yesterdayDate);
+            studyPage.Wait(studyPage.Interp_FromDate);
+
+            //substracting a month from the to date to get the past month(test step 33)
+            dt = dt.AddMonths(-1);
+            string addedMonth = dt.ToString("MM/dd/yy");
+            studyPage.Interp_FromDate.SendKeys(addedMonth);
+            studyPage.Interp_FromDate.SendKeys(Keys.Enter);
+            log.CaptureStep(" Enter yesterday date as the date To Date and enter 1 month from To date as the From date", " Verify studies with uploaded/scheduled dates within the month range chosen are only studies in the list. ", () =>
+            {
+                //  studyPage.Wait(studyPage.Interp_FromDate)
+                studyPage.noWait();
+                studyPage.Interp_btnFilter.Click();
+                studyPage.waitTime();
+         
+                studyPage.InterpFilter.Click();
+                studyPage.Wait(studyPage.Interp_FromDate);
+                studyPage.Interp_FromDate.Clear();
+                studyPage.Interp_ToDate.SendKeys(Keys.Enter);
+                studyPage.noWait();
+                studyPage.Interp_ToDate.Clear();
+                studyPage.waitTime();
+             // studyPage.TechNoti_ToDate.SendKeys(Keys.Enter);
+         });
+
+        }
+
+
+        //----- For InterpreterNotified (Test step 34-37 )-----
+        public void InterpreterNotified2(IWebDriver driver)
+    {
+
+            //step 34
+            // studyPage = new StudiesPage(driver, 1);
+            // studyPage.TechNotifiedFilter.Click();
+            
+                studyPage.Interp_name.SendKeys("Baj");
+                studyPage.Wait(studyPage.Interp_FromDate);
+            log.CaptureStep(" Enter a last name of Interpreter who is not in the system ", " Verify no studies are listed for that Technician. ", () =>
+            {
+                studyPage.Interp_btnFilter.Click();
+                studyPage.waitTime();
+            });
+
+            // Step 35
+           
+                studyPage.InterpFilter.Click();
+            studyPage.Wait(studyPage.Interp_FromDate);
+            log.CaptureStep(" Click Clear filter button", " Verify all the studies are listed. ", () =>
+            {
+                studyPage.Interp_btnClear.Click();
+                studyPage.waitTime();
+            });
+
+            // Step 36
+            
+                studyPage.InterpFilter.Click();
+                studyPage.Wait(studyPage.Interp_FromDate);
+                studyPage.Interp_name.Clear();
+                studyPage.Interp_name.SendKeys("I");
+                studyPage.Wait(studyPage.Interp_FromDate);
+            log.CaptureStep(" Enter a last name of a Interpreter which is in the system", " Verify only the studies containing Interpreter last name are listed ", () =>
+            {
+               
+                studyPage.Interp_btnFilter.Click();
+                studyPage.waitTime();
+            });
+
+            // Step 37
+           
+                studyPage.InterpFilter.Click();
+                studyPage.Wait(studyPage.Interp_FromDate);
+            log.CaptureStep(" Click clear filter button", " Verify all the studies are listed ", () =>
+            {
+                studyPage.Interp_btnClear.Click();
+                studyPage.waitTime();
+            });
+        }
+
+    // -----For Finalized Date (Step 38-42)-----
+    public void FinalizedDate(IWebDriver driver)
+    {
+            // studyPage = new StudiesPage(driver,2);
+            studyPage.FinalizedFilter.Click();
+            log.CaptureStep(" Filter the FinalizedDate by NewestToOldest", " Check the studies are listed from NewestToLowest. ", () =>
+            {
+
+                studyPage.Finalized_NewestToOldest.Click();
+                studyPage.waitTime();
+            });
+
+            
+                studyPage.FinalizedFilter.Click();
+            log.CaptureStep(" Filter the FinalizedDate by OldestToNewset", " Check the studies are listed from OldestToNewset. ", () =>
+            {
+                studyPage.Finalized_OldestToNewest.Click();
+                studyPage.waitTime();
+            });
+        }
+
+
+    // -----For StudyId (test step 43-77)-----
+    public void StudyID(IWebDriver driver)
+    {
+            //  studyPage = new StudiesPage(driver,1);
+            //step 44
+            
+                studyPage.btn_SortStudies.Click();
+                //Thread.Sleep(2000);
+             log.CaptureStep(" Filter the StudyID by Increasing", " Verify the studies are listed in increasing order. ", () =>
+             { 
+                studyPage.Study_increasing.Click(); // studyId increasing
+                studyPage.waitTime();
+            });
+            //step 45
+           
+                studyPage.btn_SortStudies.Click();
+            studyPage.Wait(studyPage.studyIdField);
+            log.CaptureStep(" Filter the StudyID by decreasing", " Verify the studies are listed in decreasing order. ", () =>
+            {
+                studyPage.Study_decreasing.Click(); // studyId decreasing
+                studyPage.waitTime();
+            });
+            // step 46
+            
+                studyPage.btn_SortStudies.Click();
+                studyPage.Wait(studyPage.studyIdField);
+
+                studyPage.studyIdField.SendKeys("00111111"); // entering study ID that is not in the system (test step 46)
+                studyPage.Wait(studyPage.studyIdField);
+            log.CaptureStep(" Enter study Id which is not in the system", " Verify no studies are not listed. ", () =>
+            {
+                studyPage.btn_StudyFilter.Click();
+                studyPage.waitTime();
+            });
+            //step 47
+           
+                studyPage.btn_SortStudies.Click();
+                studyPage.Wait(studyPage.studyIdField);
+                studyPage.studyIdField.Clear();
+                studyPage.Wait(studyPage.studyIdField);
+
+            studyPage.studyIdField.SendKeys("9500022446"); // entering study Id that is in the system(test step 47)
+            studyPage.Wait(studyPage.studyIdField);
+            log.CaptureStep(" Enter study Id which is in the system", " Verify studie with that study ID is  listed. ", () =>
+            {
+                studyPage.btn_StudyFilter.Click();
+                studyPage.waitTime();
+            });
+            log.CaptureStep(" Click Clear button", " Verify all the studies are listed ", () =>
+            {
+                studyPage.btn_SortStudies.Click();
+                studyPage.waitTime();
+
+                studyPage.btn_ClearFilter.Click();
+                studyPage.waitTime();
+            });
+        }
+
+
+    // ------For Ordering Provider(test step 49-57)------
+
+    public void orderingProvider(IWebDriver driver)
+    {
+            //   studyPage = new StudiesPage(driver,1);
+            
+                     studyPage.OrderingProviderFilter.Click();
+            log.CaptureStep(" Filter the ordering Provider by A to Z", " Check the studies are listed from A to Z ", () =>
+            {
+                studyPage.Wait(studyPage.OrderingProvider_PhyName);
+
+                studyPage.OrderingProvider_AZ.Click();
+                     studyPage.waitTime();
+                 });
+           
+                studyPage.OrderingProviderFilter.Click();
+                studyPage.Wait(studyPage.OrderingProvider_PhyName);
+            log.CaptureStep(" Filter the ordering Provider by Z to A", " Check the studies are listed from  Z to A", () =>
+            {
+                studyPage.OrderingProvider_ZA.Click();
+                studyPage.waitTime();
+            });
+            
+            // step 52
+                studyPage.OrderingProviderFilter.Click();
+                studyPage.Wait(studyPage.OrderingProvider_PhyName);
+           
+                studyPage.OrderingProvider_PhyName.SendKeys("baj");// step 52
+                studyPage.Wait(studyPage.OrderingProvider_PhyName);
+            log.CaptureStep(" Enter lastname of Ordering Provider which is not in the system", " Check no studies are listed", () =>
+            {
+                studyPage.OrderingProvider_btnFilter.Click();
+                studyPage.waitTime();
+            });
+
+
+            //step 53
+               studyPage.OrderingProviderFilter.Click();
+              studyPage.Wait(studyPage.OrderingProvider_PhyName);
+            
+                studyPage.OrderingProvider_PhyName.Clear();// clear the textbox
+                studyPage.Wait(studyPage.OrderingProvider_PhyName);
+                studyPage.OrderingProvider_PhyName.SendKeys("OP");// step 53
+                studyPage.Wait(studyPage.OrderingProvider_PhyName);
+            log.CaptureStep(" Enter lastname of Ordering Provider which is in the system", " Verify studies with the given Ordering Provider are  listed", () =>
+            {
+                studyPage.OrderingProvider_btnFilter.Click();
+                studyPage.waitTime();
+            });
+            //step 54
+                studyPage.OrderingProviderFilter.Click();
+                studyPage.Wait(studyPage.OrderingProvider_PhyName);
+
+            studyPage.OrderingProvider_PhyName.Clear();
+            studyPage.Wait(studyPage.OrderingProvider_PhyName);
+            log.CaptureStep(" Click Clear button", " Verify all the studies are listed", () =>
+            {
+                studyPage.OrderingProvider_btnClear.Click();// step 54
+                studyPage.waitTime();
+            });
+
+         // enter the name of the OP in the system step 55
+            studyPage.OrderingProviderFilter.Click();
+            studyPage.Wait(studyPage.OrderingProvider_PhyName);
+           
+                studyPage.OrderingProvider_Practice.SendKeys("fff");
+                studyPage.Wait(studyPage.OrderingProvider_PhyName);
+            log.CaptureStep(" Enter name of Practice which is not in the system ", " Verify no studies are listed", () =>
+            {
+                studyPage.OrderingProvider_btnFilter.Click();
+                studyPage.waitTime();
+            });
+
+        //  step 56
+            studyPage.OrderingProviderFilter.Click();
+            studyPage.Wait(studyPage.OrderingProvider_PhyName);
+            studyPage.OrderingProvider_Practice.Clear();
+           
+                studyPage.OrderingProvider_Practice.SendKeys("DCO-Study-TC1705"); // enter the name of the OP in the system step 55
+                studyPage.Wait(studyPage.OrderingProvider_PhyName);
+            log.CaptureStep(" Enter name of Practice which is  in the system ", " Verify only the studies associated with the Ordering Provider are  listed", () =>
+            {
+                studyPage.OrderingProvider_btnFilter.Click();
+                studyPage.waitTime();
+            });
+
+            //step 57
+             studyPage.OrderingProviderFilter.Click();
+             
+            log.CaptureStep(" Click clear button ", " Verify all the studies are  listed", () =>
+            {
+                studyPage.OrderingProvider_btnClear.Click();
+                studyPage.waitTime();
+            });
+
+
+        }
+
+    // -----For Patient Detail(test step 58-70) -----
+    public void PatientDetail(IWebDriver driver)
+    {
+        //  studyPage = new StudiesPage(driver, 1);
+        // step 59
+           studyPage.PatientFilter.Click();
+           
+            log.CaptureStep(" Filter the Patient Detail by A to Z", " Check the studies are listed from A to Z ", () =>
+                {
+                    studyPage.Patient_AZ.Click();
+                    studyPage.waitTime();
+                });
+
+            studyPage.PatientFilter.Click();
+            
+            //step 60
+            log.CaptureStep(" Filter the Patient Detail by Z to A", " Check the studies are listed from  Z to A", () =>
+            {
+                studyPage.Patient_ZA.Click();
+                studyPage.waitTime();
+            });
+
+            // step 61
+         studyPage.PatientFilter.Click();
+            studyPage.Wait(studyPage.Patient_Name);
+            
+                studyPage.Patient_ID.SendKeys("zzuu");
+                studyPage.Wait(studyPage.Patient_Name);
+            log.CaptureStep(" Enter PatientID which is not in the system ", " Verify no studies are listed", () =>
+            {
+                studyPage.Patient_btnFilter.Click();
+                studyPage.waitTime();
+            });
+
+
+            // step 62
+         studyPage.PatientFilter.Click();
+            studyPage.Wait(studyPage.Patient_Name);
+
+            studyPage.Patient_ID.Clear();
+            studyPage.Wait(studyPage.Patient_Name);
+           
+                studyPage.Patient_ID.SendKeys("DCO1237_5");
+                studyPage.Wait(studyPage.Patient_DOB);
+            log.CaptureStep(" Enter  PatientID  which is in the system ", " Verify all studies are listed", () =>
+            {
+                studyPage.Patient_btnFilter.Click();
+                studyPage.waitTime();
+            });
+            // step 63
+            studyPage.PatientFilter.Click();
+            studyPage.Wait(studyPage.Patient_Name);
+
+            studyPage.Patient_btnClear.Click();
+            log.CaptureStep(" Click clear button ", " Verify all the studies are  listed", () =>
+            {
+                studyPage.waitTime();
+            });
+
+            // step 64
+            studyPage.PatientFilter.Click();
+            studyPage.Wait(studyPage.Patient_Name);
+            
+                studyPage.Patient_Name.SendKeys("baj");
+                studyPage.Wait(studyPage.Patient_Name);
+            log.CaptureStep(" Enter a last name of a Patient which is not in the system", " Verify no studies are listed ", () =>
+            {
+                studyPage.Patient_btnFilter.Click();
+                studyPage.waitTime();
+            });
+
+
+            // step 65
+            studyPage.PatientFilter.Click();
+            studyPage.Wait(studyPage.Patient_Name);
+            studyPage.Patient_Name.Clear();
+            studyPage.Wait(studyPage.Patient_Name);
+            studyPage.Patient_Name.SendKeys("E");
+            
+            log.CaptureStep(" Enter a last name of a Patient which is in the system", " Verify only the studies containing tech last name are listed ", () =>
+            {
+                studyPage.Patient_btnFilter.Click();
+                studyPage.waitTime();
+            });
+
+            
+            // step 66
+                studyPage.PatientFilter.Click();
+                studyPage.Wait(studyPage.Patient_Name);
+            log.CaptureStep("Click clear button", " Verify all the studies are  listed ", () =>
+            {
+                studyPage.Patient_btnClear.Click();
+                studyPage.waitTime();
+            });
+
+            //adding the tomorrow date as DOB ( test step 67 )
+            studyPage.PatientFilter.Click();
+            studyPage.Wait(studyPage.Patient_Name);
+
+
+            string tomorrowDate = DateTimeChange(1);
+                studyPage.Patient_DOB.SendKeys(tomorrowDate);
+            
+                studyPage.Patient_DOB.SendKeys(Keys.Enter);//  Enter action
+                studyPage.noWait();
+            log.CaptureStep("Enter a non existent DOB and click filter", " Verify no the studies are  listed ", () =>
+            {
+                studyPage.Patient_btnFilter.Click();
+                studyPage.waitTime();
+            });
+            //step 68
+             studyPage.PatientFilter.Click();
+             studyPage.Wait(studyPage.Patient_Name);
+            // string tomorrowDate = DateTimeChange(1);
+            studyPage.Patient_DOB.Clear();
+            studyPage.Patient_DOB.SendKeys("07/02/1945");
+            log.CaptureStep("Enter a  existent DOB and click filter", " Verify the study associated with that DOB are  listed ", () =>
+            {
+                studyPage.Patient_DOB.SendKeys(Keys.Enter);//  Enter action
+                studyPage.noWait();
+                studyPage.Patient_btnFilter.Click();
+                studyPage.waitTime();
+            });
+            // step 69
+            studyPage.PatientFilter.Click();
+            studyPage.Wait(studyPage.Patient_Name);
+            log.CaptureStep("Click clear button", " Verify all the studies are  listed ", () =>
+            {
+                studyPage.Patient_btnClear.Click();
+                studyPage.waitTime();
+            });
+        }
+
+    //----- test step 70-77-----
+    public void miscVerification_common(IWebDriver driver)
+    {
+
+            //step 70-71( checking all the filter condition)
+            //studyPage = new StudiesPage(driver, 1);
+
+           
+                studyPage.selectStatusFiltered.Click();
+                studyPage.Wait(studyPage.selectStatus);
+                studyPage.selectStatus.Click();
+                studyPage.Wait(studyPage.selectStatus);
+                studyPage.selectStatusDropdown.SelectByText("Scoring");
+                log.CaptureStep("Click the filter button by Scoring", " Verify only studies with Interpreting are  listed ", () =>
+                { 
+               studyPage.Wait(studyPage.selectStatus);
+                studyPage.btn_StatusFilter.Click();
+                studyPage.waitTime();
+            });
+
+
+            //filter for StudyID
+           
+                studyPage.btn_SortStudies.Click();
+            log.CaptureStep("Sort the studies in increasing order", " Verify the studies are filtered in increasing order ", () =>
+            {
+                studyPage.Study_increasing.Click();
+                studyPage.waitTime();
+            });
+
+            //filter for orderingProvider
+           
+                studyPage.OrderingProviderFilter.Click();
+            log.CaptureStep("Sort the OrderingProvider  in AZ", " Verify the Ordering Provider are filtered in AZ order ", () =>
+            {
+                studyPage.OrderingProvider_AZ.Click();
+                studyPage.waitTime();
+            });
+
+            //filter for Patient Filter
+            
+                studyPage.PatientFilter.Click();
+            log.CaptureStep("Sort the Patient in AZ", " Verify the Patients are filtered in AZ order ", () =>
+            {
+                studyPage.Patient_AZ.Click();
+                studyPage.waitTime();
+            });
+
+         //step 72-77
+            
+         studyPage.showRows.SendKeys("100");
+         log.CaptureStep("Select 10 under ShowRows", " Verify only 100 entries are visible ", () =>
+         {
+                studyPage.waitTime();
+          });
+
+           
+          studyPage.showRows.SendKeys("50");
+          log.CaptureStep("Select 50 under ShowRows", " Verify only 50 entries are visible ", () =>
+          {
+                studyPage.waitTime();
+          });
+           
+           studyPage.showRows.SendKeys("10");
+            log.CaptureStep("Select 10 under ShowRows", "Verify only 10 entries are visible  ", () =>
+            {
+                studyPage.waitTime();
+            });
+
+            
+                studyPage.nextPage.Click();
+            log.CaptureStep("Click the forward arrow button", "Verify you are directed to page 2  ", () =>
+            {
+                studyPage.waitTime();
+            });
+            
+
+                studyPage.previousPage.Click();
+            log.CaptureStep("Click the back page arrow button", "Verify you are directed to page 1 ", () =>
+            {
+                studyPage.waitTime();
+            });
+
+           
+                studyPage.goToPage.SendKeys("3");
+            
+            log.CaptureStep("Enter a page number that is the past number of the current page", "Verify you are directed to the page number you have entered", () =>
+            {
+                studyPage.goToPage.SendKeys(Keys.Enter);
+                studyPage.waitTime();
+            });
+
+
+
+        }
+
+    public void miscVerification_uncommon(IWebDriver driver)
+    {
+
+            // filter for uploadDate
+            log.CaptureStep("Filter the UploadDate with a past date", "Verify all the studies are listed till the ToDate", () =>
+            {
+                studyPage.UploadedDateFilter.Click();
+                studyPage.Wait(studyPage.Upload_FromDate);
+                studyPage.Upload_ToDate.SendKeys("05/10/18");
+                studyPage.Wait(studyPage.Upload_FromDate);
+                studyPage.Upload_ToDate.SendKeys(Keys.Enter);
+                studyPage.noWait();
+                studyPage.Upload_btnFilter.Click();
+                studyPage.waitTime();
+            });
+
+            //filter for techNotified
+            log.CaptureStep("Filter the techNotified with a past date", "Verify the studies are listed till the ToDate", () =>
+            {
+                studyPage.TechNotifiedFilter.Click();
+                studyPage.Wait(studyPage.TechNoti_FromDate);
+                studyPage.TechNoti_ToDate.SendKeys("05/10/18");
+                studyPage.Wait(studyPage.TechNoti_FromDate);
+                studyPage.TechNoti_ToDate.SendKeys(Keys.Enter);
+                studyPage.noWait();
+                studyPage.TechNoti_btnFilter.Click();
+                studyPage.waitTime();
+            });
+
+            //filter for Interpreter Notified
+            log.CaptureStep("Filter the Interpreter Notified with a past date", "Verify the studies are listed only till the ToDate", () =>
+            { 
+                studyPage.InterpFilter.Click();
+                studyPage.Wait(studyPage.Interp_FromDate);
+                studyPage.Interp_ToDate.SendKeys("05/10/18");
+                studyPage.Wait(studyPage.Interp_FromDate);
+                studyPage.Interp_ToDate.SendKeys(Keys.Enter);
+                studyPage.noWait();
+                studyPage.Interp_btnFilter.Click();
+                studyPage.waitTime();
+            });
+
+
+
+        }
+
+
+    public void miscVerification_uncommon1(IWebDriver driver)
+    {
+            // Filter for schedule date
+            log.CaptureStep("Filter the Schedule date with a past date", "Verify the  studies are listed only till the ToDate", () =>
+            {
+
+                studyPage.ScheduledDateFilter.Click();
+                studyPage.Wait(studyPage.Scheduled_FromDate);
+                studyPage.Scheduled_ToDate.SendKeys("05/10/18");
+                studyPage.Wait(studyPage.Scheduled_FromDate);
+                studyPage.Scheduled_ToDate.SendKeys(Keys.Enter);
+                studyPage.noWait();
+                studyPage.Scheduled_btnClear.Click();
+                studyPage.waitTime();
+            });
+
+            // Filter for Finalized date
+            log.CaptureStep("Filter the Finalized date with a past date", "Verify the studies are listed only till the ToDate", () =>
+            {
+
+                studyPage.FinalizedFilter.Click();
+                studyPage.Wait(studyPage.Finalized_From);
+                studyPage.Finalized_To.SendKeys("05/10/18");
+                studyPage.Wait(studyPage.Finalized_From);
+                studyPage.Finalized_To.SendKeys(Keys.Enter);
+                studyPage.noWait();
+                studyPage.Finalized_btnClear.Click();
+                studyPage.waitTime();
+            });
+
+        }
+        
+
+
+}
+}
